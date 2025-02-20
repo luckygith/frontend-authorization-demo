@@ -8,13 +8,63 @@ import { useState } from "react";
 import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); //all logic depends onwhether or not use is logged in
+  // state variables
+  const [userData, setUserData] = useState({ username: "", email: "" });
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // all logic depends onwhether or not use is logged in
+
+  //  TO ENABLE NAVIGATION BETWEEN ROUTES
+  const navigate = useNavigate();
+
+  // handlers
+  const handleLogin = ({ username, password }) => {
+    if (!username || !password) {
+      return;
+    }
+
+    // We pass the username and password as positional arguments. The
+    // authorize function is set up to rename `username` to `identifier`
+    // before sending a request to the server, because that is what the
+    // API is expecting.
+
+    auth
+      .authorize(username, password)
+      .then((data) => {
+        // Verify that a jwt is included before logging the user in.
+        if (data.jwt) {
+          setUserData(data.user); // save user's data to state
+          setIsLoggedIn(true); // log the user in
+          navigate("/ducks"); // send them to /ducks
+        }
+      })
+      .catch(console.error);
+  };
+
+  // if confirmed, goes to auth to fetch
+  const handleRegistration = ({
+    username,
+    email,
+    password,
+    confirmPassword,
+  }) => {
+    if (password === confirmPassword) {
+      auth
+        .register(username, password, email)
+        .then(() => {
+          // TODO: handle succesful registration
+
+          // Navigate user to login page.
+          navigate("/login");
+        })
+        .catch(console.error);
+    }
+  };
+
   return (
     <Routes>
       <Route
         path="/ducks"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
             <Ducks />
           </ProtectedRoute>
         }
@@ -22,8 +72,8 @@ function App() {
       <Route
         path="/my-profile"
         element={
-          <ProtectedRoute>
-            <MyProfile />
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
+            <MyProfile userData={userData} />
           </ProtectedRoute>
         }
       />
@@ -32,7 +82,7 @@ function App() {
         path="/login"
         element={
           <div className="loginContainer">
-            <Login />
+            <Login handleLogin={handleLogin} />
           </div>
         }
       />
@@ -40,7 +90,7 @@ function App() {
         path="/register"
         element={
           <div className="registerContainer">
-            <Register />
+            <Register handleRegistration={handleRegistration} />
           </div>
         }
       />
