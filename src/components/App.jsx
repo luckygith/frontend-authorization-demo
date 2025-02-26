@@ -6,6 +6,7 @@ import Register from "./Register";
 import "./styles/App.css";
 import { useState } from "react";
 import ProtectedRoute from "./ProtectedRoute";
+import { setToken, getToken } from "../utils/token";
 
 function App() {
   // state variables
@@ -14,6 +15,26 @@ function App() {
 
   //  TO ENABLE NAVIGATION BETWEEN ROUTES
   const navigate = useNavigate();
+
+  // Single scan for JWT at first page load / jwt set from jwt.js helper function
+  useEffect(() => {
+    const jwt = getToken();
+
+    if (!jwt) {
+      return;
+    }
+    // if token is present send getUserInfo api reqest to confirm user's jwt
+    api
+      .getUserInfo(jwt)
+      .then(({ username, email }) => {
+        // If the response is successful, log the user in, save their
+        // data to state, and navigate them to /ducks.
+        setIsLoggedIn(true);
+        setUserData({ username, email });
+        navigate("/ducks");
+      })
+      .catch(console.error);
+  }, []);
 
   // handlers
   const handleLogin = ({ username, password }) => {
@@ -31,6 +52,7 @@ function App() {
       .then((data) => {
         // Verify that a jwt is included before logging the user in.
         if (data.jwt) {
+          setToken(data.jwt); // save token to loal storage!
           setUserData(data.user); // save user's data to state
           setIsLoggedIn(true); // log the user in
           navigate("/ducks"); // send them to /ducks
