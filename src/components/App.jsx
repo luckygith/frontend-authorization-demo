@@ -16,6 +16,10 @@ function App() {
   //  TO ENABLE NAVIGATION BETWEEN ROUTES
   const navigate = useNavigate();
 
+  // Invoke the hook. It's necessary to invoke the hook in both
+  // components.
+  const location = useLocation();
+
   // Single scan for JWT at first page load / jwt set from jwt.js helper function
   useEffect(() => {
     const jwt = getToken();
@@ -23,7 +27,7 @@ function App() {
     if (!jwt) {
       return;
     }
-    // if token is present send getUserInfo api reqest to confirm user's jwt
+    // if token is present send getUserInfo api reqest to confirm user's authentic jwt from api.js
     api
       .getUserInfo(jwt)
       .then(({ username, email }) => {
@@ -31,7 +35,7 @@ function App() {
         // data to state, and navigate them to /ducks.
         setIsLoggedIn(true);
         setUserData({ username, email });
-        navigate("/ducks");
+        //navigate("/ducks"); // REMOVED as authentication allows redirection to prev page or other instead
       })
       .catch(console.error);
   }, []);
@@ -55,7 +59,13 @@ function App() {
           setToken(data.jwt); // save token to loal storage!
           setUserData(data.user); // save user's data to state
           setIsLoggedIn(true); // log the user in
-          navigate("/ducks"); // send them to /ducks
+
+          // After login, instead of navigating always to /ducks,
+          // navigate to the location that is stored in state. If
+          // there is no stored location, we default to
+          // redirecting to /ducks.
+          const redirectPath = location.state?.from?.pathname || "/ducks";
+          navigate(redirectPath);
         }
       })
       .catch(console.error);
@@ -100,20 +110,28 @@ function App() {
         }
       />
 
+      {/* Wrap our /login and /registration route in a ProtectedRoute. Make sure to 
+      specify the anoymous prop, to redirect logged-in users 
+      to "/". */}
+
       <Route
         path="/login"
         element={
-          <div className="loginContainer">
-            <Login handleLogin={handleLogin} />
-          </div>
+          <ProtectedRoute isLoggedIn={isLoggedIn} anonymous>
+            <div className="loginContainer">
+              <Login handleLogin={handleLogin} />
+            </div>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/register"
         element={
-          <div className="registerContainer">
-            <Register handleRegistration={handleRegistration} />
-          </div>
+          <ProtectedRoute isLoggedIn={isLoggedIn} anonymous>
+            <div className="registerContainer">
+              <Register handleRegistration={handleRegistration} />
+            </div>
+          </ProtectedRoute>
         }
       />
       <Route
