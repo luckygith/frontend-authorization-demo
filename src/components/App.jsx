@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Ducks from "./Ducks";
 import Login from "./Login";
 import MyProfile from "./MyProfile";
@@ -7,6 +7,10 @@ import "./styles/App.css";
 import { useState } from "react";
 import ProtectedRoute from "./ProtectedRoute";
 import { setToken, getToken } from "../utils/token";
+import { useEffect } from "react";
+import "../utils/api";
+import * as auth from "../utils/auth";
+import * as api from "../utils/api";
 
 function App() {
   // state variables
@@ -18,9 +22,10 @@ function App() {
 
   // Invoke the hook. It's necessary to invoke the hook in both
   // components.
-  const location = useLocation();
+  // const location = useLocation();
 
   // Single scan for JWT at first page load / jwt set from jwt.js helper function
+
   useEffect(() => {
     const jwt = getToken();
 

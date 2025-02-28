@@ -1,19 +1,19 @@
-BASE_URL = "https://api.nomoreparties.co"; //where api is located
+export const BASE_URL = "https://api.nomoreparties.co"; //where api is located
 
-const register = (username, password, email) => {
+export const register = (username, password, email) => {
   return fetch(`${BASE_URL}/auth/local/register`, {
     method: "POST",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ userrname, password, email }),
+    body: JSON.stringify({ username, password, email }),
   }).then((res) => {
     return res.ok ? res.json() : Promise.reject(`Error: ${res.status}`);
   });
 };
 
-const authorize = (identifier, password) => {
+export const authorize = (identifier, password) => {
   return fetch(`${BASE_URL}/auth/local`, {
     method: "POST",
     headers: {
@@ -25,5 +25,3 @@ const authorize = (identifier, password) => {
     return res.ok ? res.json() : Promise.reject(`Error: ${res.status}`);
   });
 };
-
-export default register, authorize;
