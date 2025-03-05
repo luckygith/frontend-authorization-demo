@@ -4,9 +4,13 @@ import { removeToken } from "../utils/token";
 import Logo from "./Logo";
 import "./styles/NavBar.css";
 
-function NavBar({ setIsLoggedIn }) {
+import { useContext } from "react";
+import AppContext from "../contexts/AppContext"; // to set up context subscription
+
+function NavBar() {
   // use state setIsLoggedIn as prop from App.js
   const navigate = useNavigate(); // invoke hook that enables naviation between routes / use to navigate user
+  const { setIsLoggedIn } = useContext(AppContext);
 
   function signOut() {
     removeToken();
