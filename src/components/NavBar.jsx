@@ -1,8 +1,19 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+
+import { removeToken } from "../utils/token";
 import Logo from "./Logo";
 import "./styles/NavBar.css";
 
-function NavBar() {
+function NavBar({ setIsLoggedIn }) {
+  // use state setIsLoggedIn as prop from App.js
+  const navigate = useNavigate(); // invoke hook that enables naviation between routes / use to navigate user
+
+  function signOut() {
+    removeToken();
+    navigate("/login");
+    setIsLoggedIn(false);
+  }
+
   return (
     <div className="navbar">
       <div className="navbar__logo">
@@ -20,7 +31,9 @@ function NavBar() {
           </NavLink>
         </li>
         <li>
-          <button className="navbar__link navbar__button">Sign Out</button>
+          <button onClick={signOut} className="navbar__link navbar__button">
+            Sign Out
+          </button>
         </li>
       </ul>
     </div>

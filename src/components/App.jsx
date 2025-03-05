@@ -1,4 +1,11 @@
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+import NavBar from "./NavBar";
 import Ducks from "./Ducks";
 import Login from "./Login";
 import MyProfile from "./MyProfile";
@@ -20,9 +27,9 @@ function App() {
   //  TO ENABLE NAVIGATION BETWEEN ROUTES
   const navigate = useNavigate();
 
-  // Invoke the hook. It's necessary to invoke the hook in both
+  // // Invoke the hook. It's necessary to invoke the hook in both
   // components.
-  // const location = useLocation();
+  const location = useLocation();
 
   // Single scan for JWT at first page load / jwt set from jwt.js helper function
 
@@ -61,7 +68,7 @@ function App() {
       .then((data) => {
         // Verify that a jwt is included before logging the user in.
         if (data.jwt) {
-          setToken(data.jwt); // save token to loal storage!
+          setToken(data.jwt); // save token to local storage!
           setUserData(data.user); // save user's data to state
           setIsLoggedIn(true); // log the user in
 
@@ -96,13 +103,15 @@ function App() {
     }
   };
 
+  // wrapped in div, remember React expects a single root element!!!
+
   return (
     <Routes>
       <Route
         path="/ducks"
         element={
           <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <Ducks />
+            <Ducks setIsLoggedIn={setIsLoggedIn} />
           </ProtectedRoute>
         }
       />
@@ -110,7 +119,7 @@ function App() {
         path="/my-profile"
         element={
           <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <MyProfile userData={userData} />
+            <MyProfile userData={userData} setIsLoggedIn={setIsLoggedIn} />
           </ProtectedRoute>
         }
       />
